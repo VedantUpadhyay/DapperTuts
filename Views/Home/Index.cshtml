@@ -7,11 +7,17 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
 
-    <ul class="list-group">
+    <ul class="m-lg-2 list-group w-50">
         @foreach (var item in Model)
         {
-            <li class="list-group-item">@item.AuthorName - @item.BookName</li>
+            <li class="list-group-item bg-primary">@item.AuthorName - @item.BookName</li>
         }
     </ul>
+
+    <form asp-controller="Home" asp-action="IndexPost" method="post">
+        <label for="bookName">Enter Book Name</label>
+        <input name="bookName" class="form-group" type="text" id="bookName" />
+        <input type="submit" class="btn btn-primary" value="Get Result"/>
+    </form>
 
 </div>

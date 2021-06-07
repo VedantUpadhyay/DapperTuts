@@ -16,14 +16,35 @@ namespace DapperTuts.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
+        private readonly string connString;
+
 
         public HomeController(ILogger<HomeController> logger,
             IConfiguration config)
         {
             _config = config;
             _logger = logger;
+            connString = _config.GetConnectionString("DefaultConnection");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> IndexPost([FromForm]string bookName)
+        {
+            using var conn = new SqlConnection(connString);
+
+            string sqlCommand = @"SELECT [Id],
+                                  [BookName]
+                                  ,[AuthorName]
+                                  ,[ISBN]
+                              FROM[myDb].[dbo].[Book]
+                              where BookName like @bookName";
+
+            IEnumerable<Book> books = await conn.QueryAsync<Book>(sqlCommand,new { bookName = "%"+bookName+"%"});
+
+            return View("Index", books);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
 
@@ -31,7 +52,7 @@ namespace DapperTuts.Controllers
 
             using var conn = new SqlConnection(connString);
 
-            string sqlCommand = @"SELECT 
+            string sqlCommand = @"SELECT [Id],
                                   [BookName]
                                   ,[AuthorName]
                                   ,[ISBN]
