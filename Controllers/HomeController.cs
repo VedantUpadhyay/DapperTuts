@@ -27,10 +27,32 @@ namespace DapperTuts.Controllers
             connString = _config.GetConnectionString("DefaultConnection");
         }
 
+        public async Task<IActionResult> DeleteBook([FromRoute]int Id)
+        {
+            using var conn = new SqlConnection(connString);
+
+            DynamicParameters dynamicParameters = new();
+
+            dynamicParameters.Add("id", Id);
+
+            var sqlCommand = @"delete from Book where Id = @id";
+
+            int rowsAffected = await conn.ExecuteAsync(sqlCommand, dynamicParameters);
+
+            if (rowsAffected > 0)
+            {
+                return Ok(rowsAffected);
+            }
+            return BadRequest("sorry");
+        }
+
         [HttpPost]
         public async Task<IActionResult> IndexPost([FromForm]string bookName)
         {
             using var conn = new SqlConnection(connString);
+
+            var dynamicParams = new DynamicParameters();
+            dynamicParams.Add("BookName", "%" + bookName + "%");
 
             string sqlCommand = @"SELECT [Id],
                                   [BookName]
@@ -39,7 +61,7 @@ namespace DapperTuts.Controllers
                               FROM[myDb].[dbo].[Book]
                               where BookName like @bookName";
 
-            IEnumerable<Book> books = await conn.QueryAsync<Book>(sqlCommand,new { bookName = "%"+bookName+"%"});
+            IEnumerable<Book> books = await conn.QueryAsync<Book>(sqlCommand,dynamicParams);
 
             return View("Index", books);
         }

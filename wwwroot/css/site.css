@@ -61,6 +61,7 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+  font-family:Verdana;
 }
 .footer {
   position: absolute;
@@ -68,4 +69,15 @@ body {
   width: 100%;
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
+}
+
+* {
+    margin:0;
+    padding:0;
+}
+
+.trash-icon {
+    color:red;
+    text-align:right;
+    cursor:pointer;
 }

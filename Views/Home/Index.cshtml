@@ -10,7 +10,7 @@
     <ul class="m-lg-2 list-group w-50">
         @foreach (var item in Model)
         {
-            <li class="list-group-item bg-primary">@item.AuthorName - @item.BookName</li>
+            <li class="list-group-item bg-primary">@item.AuthorName - @item.BookName - <a asp-action="DeleteBook" asp-route-Id="@item.Id" class="fas fa-trash-alt trash-icon"></a></li>
         }
     </ul>
 
