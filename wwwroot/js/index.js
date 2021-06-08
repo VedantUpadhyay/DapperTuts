@@ -44,32 +44,56 @@ async function validateForm() {
     return false;
 }
 
-async function addRow() {
-    let table = document.getElementById("myBooks");
+async function doesExist(b,i) {
+    let isExists = false;
+    $.each(booksArr, (key, value) => {
+        if (value.bookName.toLowerCase() === b.toLowerCase()
+            || value.isbn === i) {
+            isExists = true;
+            return;
+        }
+    });
+    return isExists;
+}
 
-    let newBook = document.createElement("tr");
-    newBook.setAttribute("id", `bookId_${globalBookId}`);
-    $(newBook).append(`<td>${globalBookId}</td>`);
-    $(newBook).append(`<td>${bookName}</td>`);
-    $(newBook).append(`<td>${authorName}</td>`);
-    $(newBook).append(`<td>${isbn}</td>`);
-    $(newBook).append(`<td>
+async function addRow() {
+
+    doesExist(bookName,isbn).then(resp => {
+        if (resp) {
+            toastr.info('Book already exists!');
+        }
+        else {
+            console.log('wtf exists...');
+
+            let table = document.getElementById("myBooks");
+
+            let newBook = document.createElement("tr");
+            newBook.setAttribute("id", `bookId_${globalBookId}`);
+            $(newBook).append(`<td>${globalBookId}</td>`);
+            $(newBook).append(`<td>${bookName}</td>`);
+            $(newBook).append(`<td>${authorName}</td>`);
+            $(newBook).append(`<td>${isbn}</td>`);
+            $(newBook).append(`<td>
                     <i onclick="UpdateBook(${globalBookId},'${bookName}','${authorName}','${isbn}')" class="fas fa-edit"></i>
                     <i onclick="deleteBook(${globalBookId})" class="trash fas fa-trash-alt"></i>
                 </td>`);
 
 
-    table.append(newBook);
+            table.append(newBook);
 
-    let bookToAdd = {
-        bookName: bookName,
-        authorName: authorName,
-        isbn: isbn
-    };
+            let bookToAdd = {
+                bookName: bookName,
+                authorName: authorName,
+                isbn: isbn
+            };
 
-    booksArr[`id_${globalBookId}`] = bookToAdd;
+            booksArr[`id_${globalBookId}`] = bookToAdd;
 
-    globalBookId++;
+            globalBookId++;
+        }
+    });
+   
+   
 }
 
 
@@ -202,6 +226,10 @@ $().ready(() => {
             }
             //Validation is negative
             else {
+                toastr.options = {
+                    "preventDuplicates": true
+                }
+
                 toastr.error('All fields are mandatory.');
             }
         })
