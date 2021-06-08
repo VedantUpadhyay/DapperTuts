@@ -1,4 +1,5 @@
 using DapperTuts.Data;
+using DapperTuts.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -35,6 +36,8 @@ namespace DapperTuts
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
+
+            services.AddScoped<IDapperService, DapperService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

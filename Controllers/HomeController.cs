@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DapperTuts.Models;
+using DapperTuts.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,31 +16,60 @@ namespace DapperTuts.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _config;
-        private readonly string connString;
+        private readonly IDapperService _dapperService;
 
 
         public HomeController(ILogger<HomeController> logger,
-            IConfiguration config)
+            IDapperService dapperService)
         {
-            _config = config;
             _logger = logger;
-            connString = _config.GetConnectionString("DefaultConnection");
+            _dapperService = dapperService;
         }
 
-        public async Task<IActionResult> DeleteBook([FromRoute]int Id)
+        [HttpGet]
+        public async Task<IActionResult> Upsert(int? id)
         {
-            using var conn = new SqlConnection(connString);
+            Book book;
+            if (id != null)
+            {
+                
+                book = await _dapperService.GetById(id);
+            }
+            else
+            {
+                book = new();
+            }
+            return View(book);
+        }
 
-            DynamicParameters dynamicParameters = new();
+        [HttpPost]
+        public async Task<IActionResult> Upsert(Book book)
+        {
+            if (ModelState.IsValid)
+            {
+                //Update
+                if (book.Id != 0)
+                {
+                    
+                    bool done = await _dapperService.UpdateBook(book);
+                    return done ? RedirectToAction(nameof(Index)) : View(book);
+                }
 
-            dynamicParameters.Add("id", Id);
+                bool success = await _dapperService.AddBook(book);
+                if (success)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            ModelState.AddModelError("error", "Invalid Input");
+            return View(book);
+        }
 
-            var sqlCommand = @"delete from Book where Id = @id";
+        public async Task<IActionResult> DeleteBook([FromRoute] int Id)
+        {
+            bool rowsAffected = await _dapperService.DeleteBook(Id);
 
-            int rowsAffected = await conn.ExecuteAsync(sqlCommand, dynamicParameters);
-
-            if (rowsAffected > 0)
+            if (rowsAffected)
             {
                 return Ok(rowsAffected);
             }
@@ -47,21 +77,9 @@ namespace DapperTuts.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> IndexPost([FromForm]string bookName)
+        public async Task<IActionResult> GetByName([FromForm] string bookName)
         {
-            using var conn = new SqlConnection(connString);
-
-            var dynamicParams = new DynamicParameters();
-            dynamicParams.Add("BookName", "%" + bookName + "%");
-
-            string sqlCommand = @"SELECT [Id],
-                                  [BookName]
-                                  ,[AuthorName]
-                                  ,[ISBN]
-                              FROM[myDb].[dbo].[Book]
-                              where BookName like @bookName";
-
-            IEnumerable<Book> books = await conn.QueryAsync<Book>(sqlCommand,dynamicParams);
+            IEnumerable<Book> books = await _dapperService.GetByName(bookName);
 
             return View("Index", books);
         }
@@ -69,18 +87,7 @@ namespace DapperTuts.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-
-            string connString = _config.GetConnectionString("DefaultConnection");
-
-            using var conn = new SqlConnection(connString);
-
-            string sqlCommand = @"SELECT [Id],
-                                  [BookName]
-                                  ,[AuthorName]
-                                  ,[ISBN]
-                              FROM[myDb].[dbo].[Book]";
-
-            IEnumerable<Book> books = await conn.QueryAsync<Book>(sqlCommand);
+            IEnumerable<Book> books = await _dapperService.GetAll();
 
             return View(books);
         }
