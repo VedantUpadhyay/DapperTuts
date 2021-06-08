@@ -71,7 +71,7 @@ namespace DapperTuts.Controllers
 
             if (rowsAffected)
             {
-                return Ok(rowsAffected);
+                return RedirectToAction(nameof(Index));
             }
             return BadRequest("sorry");
         }

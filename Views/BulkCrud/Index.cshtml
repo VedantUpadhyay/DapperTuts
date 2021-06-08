@@ -1,0 +1,75 @@
+﻿@{ 
+    ViewData["Title"] = "SPA CRUD";
+}
+
+<h4 class="text-center">SPA - CRUD</h4>
+
+<div class="app-root">
+    <!--Upsert Form-->
+    <div class="userInputArea">
+        <form>
+            <div class="form-group">
+                <label for="bookId" class="col-form-label">Book ID : </label>
+                <input disabled id="bookId" type="number" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="bookName" class="col-form-label">Book Name : </label>
+                <input id="bookName" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="authorName" class="col-form-label">Author Name : </label>
+                <input id="authorName" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="isbn" class="col-form-label">ISBN : </label>
+                <input id="isbn" class="form-control" />
+            </div>
+
+            <input type="button" id="upsertBtn" class="btn btn-success" value="ADD">
+            <input type="button" id="cancelUpdate" class="btn btn-danger" value="Cancel Update" style="display:none;">
+        </form>
+    </div>
+
+    <!--Data Table-->
+    <div class="dataTable table-responsive-sm">
+        <table id="myBooks" class="table table-sm table-hover table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Book Name</th>
+                    <th>Author Name</th>
+                    <th>ISBN</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tr id="bookId_1">
+                <td>
+                    1
+                </td>
+                <td>
+                    Harry potter 1
+                </td>
+                <td>
+                    JK Rowling
+                </td>
+                <td>
+                    12841
+                </td>
+                <td>
+                    <i onclick="UpdateBook(1,'Harry potter 1','JK Rowling','12841')" class="fas fa-edit"></i>
+                    <i onclick="deleteBook(1)" class="trash fas fa-trash-alt"></i>
+                </td>
+                
+
+            </tr>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/js/index.js" defer></script>
+}
