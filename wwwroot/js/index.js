@@ -5,6 +5,19 @@ var updatingBookId;
 var globalBookId = 2;
 let isUpdating = false;
 
+/**
+ * Book example : - 
+ * {
+ *      id : {
+ *            bookName: 'abc',
+ *            authorName: 'xyz',
+ *            isbn: '1212'
+ *      }
+ * }
+ * */
+
+let booksArr = {};
+
 async function setGlobalValues(flag) {
     bookName = $("#bookName").val();
     authorName = $("#authorName").val();
@@ -47,6 +60,14 @@ async function addRow() {
 
 
     table.append(newBook);
+
+    let bookToAdd = {
+        bookName: bookName,
+        authorName: authorName,
+        isbn: isbn
+    };
+
+    booksArr[`id_${globalBookId}`] = bookToAdd;
 
     globalBookId++;
 }
@@ -97,6 +118,8 @@ async function deleteBook(bookIdToDelete) {
         if (result.isConfirmed) {
             $(`#bookId_${bookIdToDelete}`).remove();
 
+            delete booksArr[`id_${bookIdToDelete}`];
+
             Swal.fire(
                 'Deleted!',
                 'Book has been deleted.',
@@ -119,6 +142,13 @@ async function deleteBook(bookIdToDelete) {
 }
 
 $().ready(() => {
+    let firstBook = {
+        bookName: 'Harry potter 1',
+        authorName: 'JK Rowling',
+        isbn: '12841'
+    };
+
+    booksArr['id_1'] = firstBook;
 
     $("#cancelUpdate").click(e => {
 
@@ -157,6 +187,12 @@ $().ready(() => {
                     rowToUpdate.children[3].innerText = isbn;
 
                     $(rowToUpdate).fadeOut(1000).fadeIn(500);
+
+                    booksArr[`id_${updatingBookId}`] = {
+                        bookName: bookName,
+                        authorName: authorName,
+                        isbn: isbn
+                    }
 
                     isUpdating = false;
                     $("#upsertBtn").val("ADD");
