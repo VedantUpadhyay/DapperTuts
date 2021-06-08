@@ -75,7 +75,7 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
-  font-family:'Segoe UI';
+  font-family: inherit;
 }
 
 .footer {
@@ -137,9 +137,15 @@ body {
 .trash {
     color: red;
     cursor: pointer;
-    margin-left:2rem;
+    justify-self:flex-end;
 }
 
 .userInputArea {
     min-width:29vw;
+}
+
+.action-flex {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-around;
 }
