@@ -114,8 +114,8 @@ async function addRow() {
 
             table.append(newBook);
 
-           // document.getElementById("myBooks").scrollIntoView(false);
-
+            document.getElementById("myBooks").scrollIntoView(false);
+           
             let bookToAdd = {
                 bookName: bookName,
                 authorName: authorName,
@@ -139,6 +139,7 @@ async function addRow() {
 
             globalBookId++;
         }
+        clearForm();
     });
    
    
@@ -310,7 +311,7 @@ $().ready(() => {
             if (resp) {
                 if (!isUpdating) {
                     addRow();
-                    clearForm();
+                   // 
                 }
                 //Updating..
                 else {
