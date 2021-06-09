@@ -114,6 +114,8 @@ async function addRow() {
 
             table.append(newBook);
 
+           // document.getElementById("myBooks").scrollIntoView(false);
+
             let bookToAdd = {
                 bookName: bookName,
                 authorName: authorName,
@@ -225,9 +227,19 @@ async function deleteBook(bookIdToDelete) {
     
 }
 
-$().ready(() => {
-    //AJAX Loader
+function scrollSmoothToBottom(id) {
+    var div = document.getElementById(id);
+    console.log(div, $('#' + id));
+    $('#' + id).animate({
+        scrollTop: div.scrollHeight - div.clientHeight
+    }, 500);
+}
 
+$().ready(() => {
+
+    document.getElementById("myBooks").scrollIntoView(false);
+
+    //AJAX Loader
     $(document).on({
         ajaxStart: function () { $("body").addClass("loading"); },
         ajaxStop: function () { $("body").removeClass("loading"); }
@@ -298,6 +310,7 @@ $().ready(() => {
             if (resp) {
                 if (!isUpdating) {
                     addRow();
+                    clearForm();
                 }
                 //Updating..
                 else {
