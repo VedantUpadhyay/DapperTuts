@@ -26,6 +26,25 @@ namespace DapperTuts.Controllers
             return View(await _dapperService.GetAll());
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetCurrentIdent()
+        {
+            try
+            {
+                int currentId = await _dapperService.GetCurrentIdent();
+
+                return Json(new
+                {
+                    currentId = currentId
+                });
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<IActionResult> SaveDatabase(List<OperationVM> obj)
         {
             try

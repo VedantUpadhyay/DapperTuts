@@ -86,6 +86,15 @@ namespace DapperTuts.Services
             return rows > 0;
         }
 
+        public async Task<int> GetCurrentIdent()
+        {
+            using var conn = new SqlConnection(connString);
+
+            string sqlCommand = @"select IDENT_CURRENT('Book')";
+
+            return await conn.ExecuteScalarAsync<int>(sqlCommand);
+        }
+
         public async Task<Book> GetById(int? id)
         {
             using var conn = new SqlConnection(connString);

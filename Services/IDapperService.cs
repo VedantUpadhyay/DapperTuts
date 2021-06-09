@@ -22,5 +22,7 @@ namespace DapperTuts.Services
 
         Task<Book> GetById(int? id);
 
+        Task<int> GetCurrentIdent();
+
     }
 }

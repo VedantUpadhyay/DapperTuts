@@ -226,8 +226,24 @@ async function deleteBook(bookIdToDelete) {
 }
 
 $().ready(() => {
-    globalBookId = Number(document.getElementById("myBooks").children[1].lastElementChild.children[0].innerText.trim());
-    globalBookId++;
+    //AJAX Loader
+
+    $(document).on({
+        ajaxStart: function () { $("body").addClass("loading"); },
+        ajaxStop: function () { $("body").removeClass("loading"); }
+    });
+
+    $.ajax({
+        type: 'get',
+        url: 'BulkCrud/GetCurrentIdent',
+        success: function (resp) {
+            globalBookId = resp.currentId
+            globalBookId++;
+        }
+    });
+
+    /*globalBookId = Number(document.getElementById("myBooks").children[1].lastElementChild.children[0].innerText.trim());*/
+    
     $("#saveToDbBtn").click(async (e) => {
         //Calling AJAX function to update database
 
