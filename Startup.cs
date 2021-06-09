@@ -37,7 +37,7 @@ namespace DapperTuts
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
 
-            services.AddScoped<IDapperService, DapperService>();
+            services.AddTransient<IDapperService, DapperService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

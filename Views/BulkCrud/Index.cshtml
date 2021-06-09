@@ -1,8 +1,12 @@
-﻿@{ 
+﻿@model IEnumerable<Book>
+
+@{
     ViewData["Title"] = "SPA CRUD";
 }
 
-<h4 class="text-center">SPA - CRUD</h4>
+<h4 class="text-center">
+    SPA - CRUD
+</h4>
 
 <div class="app-root">
     <!--Upsert Form-->
@@ -30,11 +34,13 @@
 
             <input type="button" id="upsertBtn" class="btn btn-success" value="ADD">
             <input type="button" id="cancelUpdate" class="btn btn-danger" value="Cancel Update" style="display:none;">
+            <input type="button" id="saveToDbBtn" class="btn btn-primary" value="Save To Database">
         </form>
     </div>
 
     <!--Data Table-->
     <div class="dataTable table-responsive-sm">
+
         <table id="myBooks" class="table table-sm table-hover table-striped table-bordered">
             <thead class="thead-dark">
                 <tr>
@@ -45,26 +51,27 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tr id="bookId_1">
-                <td>
-                    1
-                </td>
-                <td>
-                    Harry potter 1
-                </td>
-                <td>
-                    JK Rowling
-                </td>
-                <td>
-                    12841
-                </td>
-                <td class="action-flex">
-                    <i onclick="UpdateBook(1,'Harry potter 1','JK Rowling','12841')" class="fas fa-edit"></i>
-                    <i onclick="deleteBook(1)" class="trash fas fa-trash-alt"></i>
-                </td>
-                
-
-            </tr>
+            @foreach (var book in Model)
+            {
+                <tr id="bookId_@book.Id">
+                    <td>
+                        @book.Id
+                    </td>
+                    <td>
+                        @book.BookName
+                    </td>
+                    <td>
+                        @book.AuthorName
+                    </td>
+                    <td>
+                        @book.ISBN
+                    </td>
+                    <td class="action-flex">
+                        <i onclick="UpdateBook(@book.Id,'@book.BookName','@book.AuthorName','@book.ISBN')" class="fas fa-edit"></i>
+                        <i onclick="deleteBook(@book.Id)" class="trash-icon fas fa-trash-alt"></i>
+                    </td>
+                </tr>
+            }
         </table>
     </div>
 </div>

@@ -14,14 +14,11 @@ namespace DapperTuts.Services
     {
         private readonly IConfiguration _config;
         private readonly string connString;
-        private readonly SqlConnection connSql;
-
 
         public DapperService(IConfiguration config)
         {
             this._config = config;
             this.connString = this._config.GetConnectionString("DefaultConnection");
-            connSql = new SqlConnection(connString);
         }
 
         public async Task<bool> AddBook(Book book)
@@ -29,7 +26,7 @@ namespace DapperTuts.Services
             string sqlCommand = @"insert into Book 
                                   (BookName, AuthorName, ISBN) 
                                    values(@BookName,@AuthorName,@ISBN)";
-            using var conn = connSql;
+            using var conn = new SqlConnection(connString);
 
             int rows = await conn.ExecuteAsync(sqlCommand,book);
 
@@ -39,7 +36,7 @@ namespace DapperTuts.Services
 
         public async Task<bool> DeleteBook(int id)
         {
-            using var conn = connSql;
+            using var conn = new SqlConnection(connString);
 
             DynamicParameters dynamicParameters = new();
 
@@ -56,14 +53,14 @@ namespace DapperTuts.Services
         {
             string sqlCommand = @"select * from Book";
 
-            using var conn = connSql;
+            using var conn = new SqlConnection(connString);
 
             return await conn.QueryAsync<Book>(sqlCommand);
         }
 
         public async Task<IEnumerable<Book>> GetByName(string bookName)
         {
-            using var conn = connSql;
+            using var conn = new SqlConnection(connString);
 
             var dynamicParams = new DynamicParameters();
             dynamicParams.Add("BookName", "%" + bookName + "%");
@@ -80,7 +77,7 @@ namespace DapperTuts.Services
 
         public async Task<bool> UpdateBook(Book book)
         {
-            using var conn = connSql;
+            using var conn = new SqlConnection(connString);
             string sqlCommand = @"update Book set BookName = @BookName,AuthorName = @AuthorName,ISBN = @ISBN
                where Id = @Id";
 
@@ -91,7 +88,7 @@ namespace DapperTuts.Services
 
         public async Task<Book> GetById(int? id)
         {
-            using var conn = connSql;
+            using var conn = new SqlConnection(connString);
 
             string sqlCommand = @"select * from Book
                                   where Id = @Id";

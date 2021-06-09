@@ -2,8 +2,43 @@
 
 var updatingBookId;
 
-var globalBookId = 2;
+var globalBookId = 0;
 let isUpdating = false;
+
+const INSERT = 'INSERT';
+const UPDATE = 'UPDATE';
+const DELETE = 'DELETE';
+
+/**
+ * Single Operation defined as : -
+ * JS Object - 
+ * INSERTION
+ * {
+ *    operation: const,
+ *    obj: {
+ *      id: 1,
+ *      bookName: 'abc',
+ *      authorName: 'xyz',
+ *      isbn: '1212'
+ *    }
+ * }
+ * UPDATE
+ * {
+ *      operation: const,
+ *      obj: {
+ *          ...
+ *      }
+ *  }
+ * DELETE 
+ * {
+ *      operation: const,
+ *      obj : {
+ *          id: bookId
+ *      }
+ * }
+ * */
+
+let operationsQ = [];
 
 /**
  * Book example : - 
@@ -25,7 +60,6 @@ async function setGlobalValues(flag) {
 
     if (flag) {
         updatingBookId = Number($("#bookId").val());
-        console.log('fuck u');
     }
     else {
 
@@ -63,9 +97,8 @@ async function addRow() {
             toastr.info('Book already exists!');
         }
         else {
-            console.log('wtf exists...');
 
-            let table = document.getElementById("myBooks");
+            let table = document.querySelector("#myBooks tbody");
 
             let newBook = document.createElement("tr");
             newBook.setAttribute("id", `bookId_${globalBookId}`);
@@ -73,7 +106,7 @@ async function addRow() {
             $(newBook).append(`<td>${bookName}</td>`);
             $(newBook).append(`<td>${authorName}</td>`);
             $(newBook).append(`<td>${isbn}</td>`);
-            $(newBook).append(`<td>
+            $(newBook).append(`<td class='action-flex'>
                     <i onclick="UpdateBook(${globalBookId},'${bookName}','${authorName}','${isbn}')" class="fas fa-edit"></i>
                     <i onclick="deleteBook(${globalBookId})" class="trash fas fa-trash-alt"></i>
                 </td>`);
@@ -89,6 +122,19 @@ async function addRow() {
 
             booksArr[`id_${globalBookId}`] = bookToAdd;
 
+
+            let bookOperation = {
+                operation: INSERT,
+                book: {
+                    id: globalBookId,
+                    bookName: bookName,
+                    authorName: authorName,
+                    isbn: isbn
+                }
+            };
+
+            operationsQ.push(bookOperation);
+
             globalBookId++;
         }
     });
@@ -100,10 +146,9 @@ async function addRow() {
 
 async function UpdateBook(bookId, bookName, authorName, isbn) {
     isUpdating = true;
-
+    updatingBookId = bookId;
     $("#cancelUpdate").show();
 
-    console.log('update');
 
     $("#upsertBtn").val("UPDATE");
 
@@ -113,15 +158,13 @@ async function UpdateBook(bookId, bookName, authorName, isbn) {
     $("#isbn").val(isbn);
 }
 
-async function fillBookToUpdate() {
-
-}
 
 async function clearForm() {
     //globalBookId = 0;
     bookName = undefined;
     authorName = undefined;
     isbn = undefined;
+    updatingBookId = 0;
 
     $("#bookId").val('');
     $("#bookName").val('');
@@ -140,15 +183,32 @@ async function deleteBook(bookIdToDelete) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            $(`#bookId_${bookIdToDelete}`).remove();
 
-            delete booksArr[`id_${bookIdToDelete}`];
+            if (bookIdToDelete === updatingBookId) {
+                toastr.warning("Can't delete the book you're updating.<br>First Cancel Update.");
+            } else {
+                $(`#bookId_${bookIdToDelete}`).remove();
 
-            Swal.fire(
-                'Deleted!',
-                'Book has been deleted.',
-                'success'
-            )
+                delete booksArr[`id_${bookIdToDelete}`];
+
+                Swal.fire(
+                    'Deleted!',
+                    'Book has been deleted.',
+                    'success'
+                )
+
+                //adding operations
+                let bookOperation = {
+                    operation: DELETE,
+                    book: {
+                        id: bookIdToDelete
+                    }
+                };
+
+                operationsQ.push(bookOperation);
+            }
+
+           
             //if (document.querySelector("#myBooks tbody").children.length === 0) {
             //    let emptyDiv = document.createElement("div")
             //    emptyDiv.style.background = "lightgrey";
@@ -166,6 +226,30 @@ async function deleteBook(bookIdToDelete) {
 }
 
 $().ready(() => {
+    globalBookId = Number(document.getElementById("myBooks").children[1].lastElementChild.children[0].innerText.trim());
+    globalBookId++;
+    $("#saveToDbBtn").click(async (e) => {
+        //Calling AJAX function to update database
+
+        if (operationsQ.length > 0) {
+            $.ajax({
+                type: 'post',
+                url: 'BulkCrud/SaveDatabase',
+                data: {
+                    obj: operationsQ
+                },
+                success: function (resp) {
+                    toastr["success"]("Saved to database successfully.");
+                },
+                error: function (err) {
+                    toastr["error"]("Error in server..<br>", err);
+                }
+            });
+        }
+
+        operationsQ.splice(0, operationsQ.length);
+    });
+
     let firstBook = {
         bookName: 'Harry potter 1',
         authorName: 'JK Rowling',
@@ -210,6 +294,8 @@ $().ready(() => {
                     rowToUpdate.children[2].innerText = authorName;
                     rowToUpdate.children[3].innerText = isbn;
 
+                    rowToUpdate.children[4].children[0].setAttribute('onclick', `UpdateBook(${updatingBookId},'${bookName}','${authorName}','${isbn}')`);
+
                     $(rowToUpdate).fadeOut(1000).fadeIn(500);
 
                     booksArr[`id_${updatingBookId}`] = {
@@ -217,6 +303,18 @@ $().ready(() => {
                         authorName: authorName,
                         isbn: isbn
                     }
+
+                    let bookOperation = {
+                        operation: UPDATE,
+                        book: {
+                            id: updatingBookId,
+                            bookName: bookName,
+                            authorName: authorName,
+                            isbn: isbn
+                        }
+                    };
+
+                    operationsQ.push(bookOperation);
 
                     isUpdating = false;
                     $("#upsertBtn").val("ADD");
