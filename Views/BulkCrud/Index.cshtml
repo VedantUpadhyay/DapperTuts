@@ -51,27 +51,29 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            @foreach (var book in Model)
-            {
-                <tr id="bookId_@book.Id">
-                    @*<td>
-                        @book.Id
-                    </td>*@
-                    <td>
-                        @book.BookName
-                    </td>
-                    <td>
-                        @book.AuthorName
-                    </td>
-                    <td>
-                        @book.ISBN
-                    </td>
-                    <td class="action-flex">
-                        <i onclick="UpdateBook(this.parentElement.parentElement,@book.Id,'@book.BookName','@book.AuthorName','@book.ISBN')" class="fas fa-edit"></i>
-                        <i onclick="deleteBook(@book.Id)" class="trash-icon fas fa-trash-alt"></i>
-                    </td>
-                </tr>
-            }
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr id="bookId_@book.Id">
+                        @*<td>
+                    @book.Id
+                </td>*@
+                        <td>
+                            @book.BookName
+                        </td>
+                        <td>
+                            @book.AuthorName
+                        </td>
+                        <td>
+                            @book.ISBN
+                        </td>
+                        <td class="action-flex">
+                            <i onclick="UpdateBook(this.parentElement.parentElement,@book.Id,'@book.BookName','@book.AuthorName','@book.ISBN')" class="fas fa-edit"></i>
+                            <i onclick="deleteBook(this.parentElement.parentElement)" class="trash-icon fas fa-trash-alt"></i>
+                        </td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 </div>

@@ -154,8 +154,12 @@ namespace DapperTuts.Services
         {
             using var conn = new SqlConnection(connString);
 
-            int rows = await conn.ExecuteAsync("[dbo].[bulkcrud]", new {
-                booksType = books.ToList().ToDataTable()
+            string sp_name = "[dbo].[bulkdcrud_old]";
+            //string sp_name = "[dbo].[bulkcrud]";
+
+
+            int rows = await conn.ExecuteAsync(sp_name, new {
+                bookView = books.ToList().ToDataTable()
             }, commandType: CommandType.StoredProcedure);
             return rows > 0;
         }

@@ -111,7 +111,7 @@ async function addRow() {
             $(newBook).append(`<td>${isbn}</td>`);
             $(newBook).append(`<td class='action-flex'>
                     <i onclick="UpdateBook(this.parentElement.parentElement,${0},'${bookName}','${authorName}','${isbn}')" class="fas fa-edit"></i>
-                    <i onclick="deleteBook(${globalBookId})" class="trash fas fa-trash-alt"></i>
+                    <i onclick="deleteBook(this.parentElement.parentElement)" class="trash fas fa-trash-alt"></i>
                 </td>`);
 
 
@@ -125,10 +125,10 @@ async function addRow() {
                 isbn: isbn
             };
 
-            booksArr[`id_${globalBookId}`] = bookToAdd;
+            //booksArr[`id_${globalBookId}`] = bookToAdd;
 
 
-            let bookOperation = {
+          /*  let bookOperation = {
                 operation: INSERT,
                 book: {
                     id: globalBookId,
@@ -139,7 +139,7 @@ async function addRow() {
             };
 
             operationsQ.push(bookOperation);
-
+            */
             globalBookId++;
         }
         clearForm();
@@ -179,7 +179,7 @@ async function clearForm() {
     $("#isbn").val('');
 }
 
-async function deleteBook(bookIdToDelete) {
+async function deleteBook(deleteRow) {
     Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
@@ -191,12 +191,15 @@ async function deleteBook(bookIdToDelete) {
     }).then((result) => {
         if (result.isConfirmed) {
 
-            if (bookIdToDelete === updatingBookId) {
+            
+            /*if (bookIdToDelete === updatingBookId) {
                 toastr.warning("Can't delete the book you're updating.<br>First Cancel Update.");
-            } else {
-                $(`#bookId_${bookIdToDelete}`).remove();
+            } else {*/
+//                $(`#bookId_${bookIdToDelete}`).remove();
+            console.log(deleteRow);
+            $(deleteRow).remove();
 
-                delete booksArr[`id_${bookIdToDelete}`];
+                //delete booksArr[`id_${bookIdToDelete}`];
 
                 Swal.fire(
                     'Deleted!',
@@ -205,15 +208,15 @@ async function deleteBook(bookIdToDelete) {
                 )
 
                 //adding operations
-                let bookOperation = {
+                /*let bookOperation = {
                     operation: DELETE,
                     book: {
                         id: bookIdToDelete
                     }
-                };
+                };*/
 
-                operationsQ.push(bookOperation);
-            }
+               // operationsQ.push(bookOperation);
+            //}
 
            
             //if (document.querySelector("#myBooks tbody").children.length === 0) {
