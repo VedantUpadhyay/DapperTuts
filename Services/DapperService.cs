@@ -78,6 +78,7 @@ namespace DapperTuts.Services
         public async Task<bool> UpdateBook(Book book)
         {
             using var conn = new SqlConnection(connString);
+            
             string sqlCommand = @"update Book set BookName = @BookName,AuthorName = @AuthorName,ISBN = @ISBN
                where Id = @Id";
 
@@ -103,6 +104,48 @@ namespace DapperTuts.Services
                                   where Id = @Id";
 
             return await conn.QueryFirstAsync<Book>(sqlCommand, new { Id = id });
+        }
+
+        public async Task<bool> SaveBooks(List<Book> insertRows, List<Book> updateRows, List<Book> deleteRows)
+        {
+            using var conn = new SqlConnection(connString);
+
+            await conn.OpenAsync();
+            var trans = await conn.BeginTransactionAsync();
+
+            string insertSql = @"insert into Book 
+                              (BookName, AuthorName, ISBN) 
+                               values(@BookName,@AuthorName,@ISBN)";
+
+            string updateSql = @"update Book set BookName =                          @BookName,AuthorName = @AuthorName,ISBN = @ISBN
+                          where Id = @Id";
+
+            string deleteSql = @"delete from Book where Id = @Id";
+
+            int rows = 0;
+            try
+            {
+
+                rows = await conn.ExecuteAsync(insertSql, insertRows,trans);
+
+                rows += await conn.ExecuteAsync(updateSql, updateRows, trans);
+
+                rows += await conn.ExecuteAsync(deleteSql, deleteRows, trans);
+
+                //commit all operations only when all ops executes successfully.
+                await trans.CommitAsync();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                await conn.CloseAsync();
+            }
+
+            return rows > 0;
+            
         }
     }
 }

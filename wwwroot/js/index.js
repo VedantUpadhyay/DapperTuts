@@ -102,7 +102,7 @@ async function addRow() {
 
             let newBook = document.createElement("tr");
             newBook.setAttribute("id", `bookId_${globalBookId}`);
-            $(newBook).append(`<td>${globalBookId}</td>`);
+            //$(newBook).append(`<td>${globalBookId}</td>`);
             $(newBook).append(`<td>${bookName}</td>`);
             $(newBook).append(`<td>${authorName}</td>`);
             $(newBook).append(`<td>${isbn}</td>`);
@@ -320,11 +320,11 @@ $().ready(() => {
                     //0  -  1    -  2    -  3
                     //id - bname - aname - isbn
 
-                    rowToUpdate.children[1].innerText = bookName;
-                    rowToUpdate.children[2].innerText = authorName;
-                    rowToUpdate.children[3].innerText = isbn;
+                    rowToUpdate.children[0].innerText = bookName;
+                    rowToUpdate.children[1].innerText = authorName;
+                    rowToUpdate.children[2].innerText = isbn;
 
-                    rowToUpdate.children[4].children[0].setAttribute('onclick', `UpdateBook(${updatingBookId},'${bookName}','${authorName}','${isbn}')`);
+                    rowToUpdate.children[3].children[0].setAttribute('onclick', `UpdateBook(${updatingBookId},'${bookName}','${authorName}','${isbn}')`);
 
                     $(rowToUpdate).fadeOut(1000).fadeIn(500);
 

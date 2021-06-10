@@ -1,9 +1,11 @@
-﻿using DapperTuts.Models.ViewModels;
+﻿using DapperTuts.Models;
+using DapperTuts.Models.ViewModels;
 using DapperTuts.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DapperTuts.Controllers
@@ -47,29 +49,16 @@ namespace DapperTuts.Controllers
 
         public async Task<IActionResult> SaveDatabase(List<OperationVM> obj)
         {
+            bool result = false;
             try
             {
-                foreach (var op in obj)
-                {
-                    switch (op.Operation)
-                    {
-                        case INSERT:
-                            await _dapperService.AddBook(op.Book);
-                            break;
+                List<Book> insertRows = obj.Where(o => o.Operation == INSERT).Select(s => s.Book).ToList();
 
-                        case UPDATE:
-                            await _dapperService.UpdateBook(op.Book);
-                            break;
+                List<Book> updateRows = obj.Where(o => o.Operation == UPDATE).Select(s => s.Book).ToList();
 
-                        case DELETE:
-                            await _dapperService
-                                .DeleteBook(op.Book.Id);
-                            break;
+                List<Book> deleteRows = obj.Where(o => o.Operation == DELETE).Select(s => s.Book).ToList();
 
-                        default:
-                            break;
-                    }
-                }
+                result = await _dapperService.SaveBooks(insertRows, updateRows, deleteRows);
             }
             catch (Exception ex)
             {
@@ -77,7 +66,7 @@ namespace DapperTuts.Controllers
             }
          
 
-            return Ok();
+            return result ? StatusCode(200) : StatusCode(500);
         }
     }
 }

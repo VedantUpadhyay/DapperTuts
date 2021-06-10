@@ -24,5 +24,6 @@ namespace DapperTuts.Services
 
         Task<int> GetCurrentIdent();
 
+        Task<bool> SaveBooks(List<Book> insertRows, List<Book> updateRows, List<Book> deleteRows);
     }
 }
