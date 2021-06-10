@@ -5,6 +5,9 @@ var updatingBookId;
 var globalBookId = 0;
 let isUpdating = false;
 
+let booksList = [];
+let currentUpdatingRow;
+
 const INSERT = 'INSERT';
 const UPDATE = 'UPDATE';
 const DELETE = 'DELETE';
@@ -101,13 +104,13 @@ async function addRow() {
             let table = document.querySelector("#myBooks tbody");
 
             let newBook = document.createElement("tr");
-            newBook.setAttribute("id", `bookId_${globalBookId}`);
+            newBook.setAttribute("id", `bookId_${0}`);
             //$(newBook).append(`<td>${globalBookId}</td>`);
             $(newBook).append(`<td>${bookName}</td>`);
             $(newBook).append(`<td>${authorName}</td>`);
             $(newBook).append(`<td>${isbn}</td>`);
             $(newBook).append(`<td class='action-flex'>
-                    <i onclick="UpdateBook(${globalBookId},'${bookName}','${authorName}','${isbn}')" class="fas fa-edit"></i>
+                    <i onclick="UpdateBook(this.parentElement.parentElement,${0},'${bookName}','${authorName}','${isbn}')" class="fas fa-edit"></i>
                     <i onclick="deleteBook(${globalBookId})" class="trash fas fa-trash-alt"></i>
                 </td>`);
 
@@ -147,8 +150,9 @@ async function addRow() {
 
 
 
-async function UpdateBook(bookId, bookName, authorName, isbn) {
+async function UpdateBook(row,bookId, bookName, authorName, isbn) {
     isUpdating = true;
+    currentUpdatingRow = row;
     updatingBookId = bookId;
     $("#cancelUpdate").show();
 
@@ -236,6 +240,21 @@ function scrollSmoothToBottom(id) {
     }, 500);
 }
 
+function fillBooksList() {
+    $("#myBooks tbody").children().each((i, row) => {
+        let book_id = $(row).attr('id').split('_')[1];
+
+        //console.log($(row).children().eq(2).text());
+
+        booksList.push({
+            id: book_id,
+            bookName: $(row).children().eq(0).text().trim(),
+            authorName: $(row).children().eq(1).text().trim(),
+            isbn: $(row).children().eq(2).text().trim()
+        });
+    });
+}
+
 $().ready(() => {
 
     document.getElementById("myBooks").scrollIntoView(false);
@@ -260,12 +279,15 @@ $().ready(() => {
     $("#saveToDbBtn").click(async (e) => {
         //Calling AJAX function to update database
 
-        if (operationsQ.length > 0) {
+        fillBooksList();
+
+        //if (operationsQ.length > 0) {
             $.ajax({
                 type: 'post',
-                url: 'BulkCrud/SaveDatabase',
+                url: 'BulkCrud/SaveDatabaseBulk',
                 data: {
-                    obj: operationsQ
+                    obj: booksList
+                    //obj: operationsQ
                 },
                 success: function (resp) {
                     toastr["success"]("Saved to database successfully.");
@@ -274,9 +296,9 @@ $().ready(() => {
                     toastr["error"]("Error in server..<br>", err);
                 }
             });
-        }
-
-        operationsQ.splice(0, operationsQ.length);
+       // }
+        booksList.splice(0, booksList.length);
+       // operationsQ.splice(0, operationsQ.length);
     });
 
     let firstBook = {
@@ -315,7 +337,8 @@ $().ready(() => {
                 }
                 //Updating..
                 else {
-                    let rowToUpdate = document.getElementById(`bookId_${updatingBookId}`);
+                    //let rowToUpdate = document.getElementById(`bookId_${updatingBookId}`);
+                    let rowToUpdate = currentUpdatingRow;       
 
                     //0  -  1    -  2    -  3
                     //id - bname - aname - isbn

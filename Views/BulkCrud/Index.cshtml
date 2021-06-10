@@ -67,7 +67,7 @@
                         @book.ISBN
                     </td>
                     <td class="action-flex">
-                        <i onclick="UpdateBook(@book.Id,'@book.BookName','@book.AuthorName','@book.ISBN')" class="fas fa-edit"></i>
+                        <i onclick="UpdateBook(this.parentElement.parentElement,@book.Id,'@book.BookName','@book.AuthorName','@book.ISBN')" class="fas fa-edit"></i>
                         <i onclick="deleteBook(@book.Id)" class="trash-icon fas fa-trash-alt"></i>
                     </td>
                 </tr>

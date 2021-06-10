@@ -25,5 +25,7 @@ namespace DapperTuts.Services
         Task<int> GetCurrentIdent();
 
         Task<bool> SaveBooks(List<Book> insertRows, List<Book> updateRows, List<Book> deleteRows);
+
+        Task<bool> BullkCrudUsingSP(IEnumerable<Book> books);
     }
 }

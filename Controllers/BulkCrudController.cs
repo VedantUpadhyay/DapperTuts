@@ -47,6 +47,14 @@ namespace DapperTuts.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveDatabaseBulk(List<Book> obj)
+        {
+            bool res = await _dapperService.BullkCrudUsingSP(obj);
+
+            return res ? Ok() : BadRequest();
+        }
+
         public async Task<IActionResult> SaveDatabase(List<OperationVM> obj)
         {
             bool result = false;

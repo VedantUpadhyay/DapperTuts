@@ -7,6 +7,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using System.Data;
+using System.Reflection;
 
 namespace DapperTuts.Services
 {
@@ -146,6 +148,45 @@ namespace DapperTuts.Services
 
             return rows > 0;
             
+        }  
+
+        public async Task<bool> BullkCrudUsingSP(IEnumerable<Book> books)
+        {
+            using var conn = new SqlConnection(connString);
+
+            int rows = await conn.ExecuteAsync("[dbo].[bulkcrud]", new {
+                booksType = books.ToList().ToDataTable()
+            }, commandType: CommandType.StoredProcedure);
+            return rows > 0;
+        }
+
+       
+    }
+    static class DataTableExtension
+    {
+        public static DataTable ToDataTable<T>(this List<T> items)
+        {
+            var tb = new DataTable(typeof(T).Name);
+
+            PropertyInfo[] props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var prop in props)
+            {
+                tb.Columns.Add(prop.Name, prop.PropertyType);
+            }
+
+            foreach (var item in items)
+            {
+                var values = new object[props.Length];
+                for (var i = 0; i < props.Length; i++)
+                {
+                    values[i] = props[i].GetValue(item, null);
+                }
+
+                tb.Rows.Add(values);
+            }
+
+            return tb;
         }
     }
 }
